@@ -289,13 +289,33 @@ let touch_move = function(event) {
 			court.zoneArray[current_zone_index].centerY += dy;
 		}
 		// BORDER RESTRICTIONS>>>>>>>
+
 		// <<<<PLAYER RESTRICTIONS
-		if (court.zoneArray[current_zone_index].centerX - court.zoneArray[current_zone_index].radius <= court.x) {
+		console.log("current_zone_index", current_zone_index)
+		if ([3, 4].includes(current_zone_index)) {
+			if (court.zoneArray[current_zone_index].centerX <= court.zoneArray[current_zone_index + 1].centerX) {
 
-			court.zoneArray[current_zone_index].centerX +=1;
-		} 
+			court.zoneArray[current_zone_index].centerX = court.zoneArray[current_zone_index + 1].centerX + 5;
+		} }
+		
+		if ([4, 5].includes(current_zone_index)) {
+			if (court.zoneArray[current_zone_index].centerX >= court.zoneArray[current_zone_index - 1].centerX) {
 
+			court.zoneArray[current_zone_index].centerX = court.zoneArray[current_zone_index - 1].centerX - 5;
+		} }
+		if ([1, 2].includes(current_zone_index)) {
+			console.log("zone", current_zone_index);
+			if (court.zoneArray[current_zone_index].centerX <= court.zoneArray[current_zone_index - 1].centerX) {
 
+			court.zoneArray[current_zone_index].centerX = court.zoneArray[current_zone_index - 1].centerX + 5;
+		} }
+		
+		if ([0, 1].includes(current_zone_index)) {
+			if (court.zoneArray[current_zone_index].centerX >= court.zoneArray[current_zone_index + 1].centerX) {
+
+			court.zoneArray[current_zone_index].centerX = court.zoneArray[current_zone_index + 1].centerX - 5;
+		} }
+		// PLAYER RESTRICTIONS>>>>>>>
 
 
 		startX = mouseX;
@@ -355,11 +375,53 @@ let mouse_move = function(event) {
 		}
 		// BORDER RESTRICTIONS>>>>>>>
 		// <<<<PLAYER RESTRICTIONS
-		if (court.zoneArray[current_zone_index].centerX - court.zoneArray[current_zone_index].radius <= court.x) {
+		console.log("current_zone_index", current_zone_index)
+		if ([4, 3].includes(current_zone_index)) {
+			console.log("zone", current_zone_index);
+			if (court.zoneArray[current_zone_index].centerX <= court.zoneArray[current_zone_index + 1].centerX) {
 
-			court.zoneArray[current_zone_index].centerX +=1;
-		} 
+			court.zoneArray[current_zone_index].centerX = court.zoneArray[current_zone_index + 1].centerX + 5;
+		} }
+		// horizontal
+		if ([4, 5].includes(current_zone_index)) {
+			if (court.zoneArray[current_zone_index].centerX >= court.zoneArray[current_zone_index - 1].centerX) {
 
+			court.zoneArray[current_zone_index].centerX = court.zoneArray[current_zone_index - 1].centerX - 5;
+		} }
+		if ([1, 2].includes(current_zone_index)) {
+			console.log("zone", current_zone_index);
+			if (court.zoneArray[current_zone_index].centerX <= court.zoneArray[current_zone_index - 1].centerX) {
+
+			court.zoneArray[current_zone_index].centerX = court.zoneArray[current_zone_index - 1].centerX + 5;
+		} }
+		
+		if ([0, 1].includes(current_zone_index)) {
+			if (court.zoneArray[current_zone_index].centerX >= court.zoneArray[current_zone_index + 1].centerX) {
+
+			court.zoneArray[current_zone_index].centerX = court.zoneArray[current_zone_index + 1].centerX - 5;
+		} }
+		// vertical
+		if ([0, 1, 2].includes(current_zone_index)) {
+			console.log(1, court.zoneArray[current_zone_index]);
+			const reversed_array = [...court.zoneArray].reverse();
+			// reversed_array = reversed_array.reverse();
+			console.log(2, reversed_array[current_zone_index]);
+
+			if (court.zoneArray[current_zone_index].centerY >= reversed_array[current_zone_index].centerY) {
+				console.log("Ouch");
+				court.zoneArray[current_zone_index].centerY = reversed_array[current_zone_index].centerY - 5;
+		} }
+		if ([3, 4, 5].includes(current_zone_index)) {
+			console.log(1, court.zoneArray[current_zone_index]);
+			const reversed_array = [...court.zoneArray].reverse();
+			// reversed_array = reversed_array.reverse();
+			console.log(2, reversed_array[current_zone_index]);
+
+			if (court.zoneArray[current_zone_index].centerY <= reversed_array[current_zone_index].centerY) {
+				console.log("Ouch");
+				court.zoneArray[current_zone_index].centerY = reversed_array[current_zone_index].centerY + 5;
+		} }
+		// PLAYER RESTRICTIONS>>>>>>>
 
 
 
@@ -394,8 +456,11 @@ canvas.onmouseup = mouse_up;
 canvas.onmouseout = mouse_out;
 canvas.onmousemove = mouse_move;
 
+let lastTime = 0;
 
-function animate(){
+function animate(timeStamp){
+	const deltaTime = timeStamp - lastTime;
+	lastTime = timeStamp;
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 
@@ -410,4 +475,4 @@ function animate(){
 	 	);
 	requestAnimationFrame(animate);
 }
-animate();
+animate(0);
