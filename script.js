@@ -315,8 +315,28 @@ let touch_move = function(event) {
 
 			court.zoneArray[current_zone_index].centerX = court.zoneArray[current_zone_index + 1].centerX - 5;
 		} }
-		// PLAYER RESTRICTIONS>>>>>>>
+		// vertical
+		if ([0, 1, 2].includes(current_zone_index)) {
+			console.log(1, court.zoneArray[current_zone_index]);
+			const reversed_array = [...court.zoneArray].reverse();
+			// reversed_array = reversed_array.reverse();
+			console.log(2, reversed_array[current_zone_index]);
 
+			if (court.zoneArray[current_zone_index].centerY >= reversed_array[current_zone_index].centerY) {
+				console.log("Ouch");
+				court.zoneArray[current_zone_index].centerY = reversed_array[current_zone_index].centerY - 5;
+		} }
+		if ([3, 4, 5].includes(current_zone_index)) {
+			console.log(1, court.zoneArray[current_zone_index]);
+			const reversed_array = [...court.zoneArray].reverse();
+			// reversed_array = reversed_array.reverse();
+			console.log(2, reversed_array[current_zone_index]);
+
+			if (court.zoneArray[current_zone_index].centerY <= reversed_array[current_zone_index].centerY) {
+				console.log("Ouch");
+				court.zoneArray[current_zone_index].centerY = reversed_array[current_zone_index].centerY + 5;
+		} }
+		// PLAYER RESTRICTIONS>>>>>>>
 
 		startX = mouseX;
 		startY = mouseY;
