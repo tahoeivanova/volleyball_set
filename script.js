@@ -76,12 +76,12 @@ class playingCourt {
 		this.side2 = {x:this.x, y:this.y + this.courtHeight/2, width: this.courtWidth, height: this.courtHeight/2};
 
 		this.zoneArray = [
-				{zone: 1, side: 1, x:this.x, y:this.y, width: this.courtWidth/3, height: this.courtHeight/4, color: "#ff3377"},
-				{zone: 6, side: 1, x:this.x + this.courtWidth/3, y:this.y, width: this.courtHeight/6, height: this.courtHeight/4, color: "#ff4d88"},
-				{zone: 5, side: 1, x:this.x + (this.courtWidth/3)*2, y:this.y, width: this.courtHeight/6, height: this.courtHeight/4, color: "#ff6699"},
-				{zone: 4, side: 1, x:this.x + (this.courtWidth/3)*2, y:this.y + this.courtHeight/4, width: this.courtWidth/3, height: this.courtHeight/4, color: "#ff6699"},
-				{zone: 3, side: 1, x:this.x + this.courtWidth/3, y:this.y  + this.courtHeight/4, width: this.courtWidth/3, height: this.courtHeight/4, color: "#ff99bb"},
-				{zone: 2, side: 1, x:this.x, y:this.y  + this.courtHeight/4, width: this.courtWidth/3, height: this.courtHeight/4, color: "#ffb3cc"}
+				{zone: 1, side: 1, x:this.x, y:this.y, width: this.courtWidth/3, height: this.courtHeight/4, color: "#ff3377", playerColor: "#00ff80"},
+				{zone: 6, side: 1, x:this.x + this.courtWidth/3, y:this.y, width: this.courtHeight/6, height: this.courtHeight/4, color: "#ff4d88", playerColor: "#0088cc"},
+				{zone: 5, side: 1, x:this.x + (this.courtWidth/3)*2, y:this.y, width: this.courtHeight/6, height: this.courtHeight/4, color: "#ff6699", playerColor: "#ff0000"},//#ff1a1a #ff4d4d
+				{zone: 4, side: 1, x:this.x + (this.courtWidth/3)*2, y:this.y + this.courtHeight/4, width: this.courtWidth/3, height: this.courtHeight/4, color: "#ff6699", playerColor: "#ff6633"},
+				{zone: 3, side: 1, x:this.x + this.courtWidth/3, y:this.y  + this.courtHeight/4, width: this.courtWidth/3, height: this.courtHeight/4, color: "#ff99bb", playerColor: "#4dc3ff"},
+				{zone: 2, side: 1, x:this.x, y:this.y  + this.courtHeight/4, width: this.courtWidth/3, height: this.courtHeight/4, color: "#ffb3cc", playerColor: "#ff1a1a"}//#cc0000
 		];
 
 
@@ -95,12 +95,13 @@ class playingCourt {
 			this.zoneArray[i].centerX = centerX;
 			this.zoneArray[i].centerY = centerY;
 			this.zoneArray[i].radius = radius;
-
-
-		
-
     	}
 	}
+
+	rotate() {
+		
+	}
+
 	draw() {
 	
 
@@ -154,19 +155,20 @@ class playingCourt {
 
 
 class Player {
-	constructor(x, y, radius, player_index) {
+	constructor(x, y, radius, player_index, playerColor) {
 		this.x = x;
 		this.y = y;
 		this.radius = radius;
 		this.player_index = player_index;
+		this.playerColor = playerColor;
 	}
 	draw() {
 		ctx.beginPath();
 		ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
-		ctx.fillStyle = 'green';
+		ctx.fillStyle = this.playerColor;
 		ctx.fill();
-		ctx.lineWidth = 5;
-		ctx.strokeStyle = 'green';
+		ctx.lineWidth = 3;
+		ctx.strokeStyle = 'black';
 		ctx.stroke();
 	}
 	update() {
@@ -462,7 +464,7 @@ court.init();
 
 let shape_index = 0;
 for (shape of court.zoneArray) {
-	players.push(new Player(shape.centerX, shape.centerY, shape.radius, shape_index));
+	players.push(new Player(shape.centerX, shape.centerY, shape.radius, shape_index, shape.playerColor));
 	shape_index++;
 }
 
