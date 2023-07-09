@@ -31,8 +31,9 @@ document.addEventListener("DOMContentLoaded", function(){
 	let rotatingStatus = [];
 	let rotationPosition = 1;
 	let rotationSymbols = [];
-	let rotation_image = document.getElementById('rotationImage');
+	// let rotation_image = document.getElementById('rotationImage');
 	let animationIcon = false;
+	let shakeStart;
 
 	function rotatePlayers() {
 		rotateProcess = true;
@@ -42,8 +43,9 @@ document.addEventListener("DOMContentLoaded", function(){
 	}
 
 	function animateIcon() {
-		// animationIcon = true;
-	 //    ctx.drawImage(rotation_image, 0,0, 50, 50, rotationButtonCoords.x, rotationButtonCoords.y, rotationButtonCoords.width, rotationButtonCoords.height);
+		animationIcon = true;
+		shakeStart = window.performance.now();
+
 
 	}
 
@@ -89,10 +91,11 @@ document.addEventListener("DOMContentLoaded", function(){
 		}
 		// ctx.strokeStyle = '#808080';
 	 //    ctx.strokeRect(rotationButtonCoords.x, rotationButtonCoords.y, rotationButtonCoords.width, rotationButtonCoords.height);
-	    if (!animationIcon)
-	    {
-	    	ctx.drawImage(rotation_image, 0,0, 50, 50, rotationButtonCoords.x, rotationButtonCoords.y, rotationButtonCoords.width, rotationButtonCoords.height);
-		}
+	 //    if (!animationIcon)
+	 //    {
+	 //    	rotation_icon.draw()
+	 //    	ctx.drawImage(rotation_image, 0,0, 50, 50, rotationButtonCoords.x, rotationButtonCoords.y, rotationButtonCoords.width, rotationButtonCoords.height);
+		// }
 		// ctx.textAlign = 'center';
 		// ctx.textBaseline = 'middle';
 		// ctx.fillStyle = 'black';
@@ -249,6 +252,35 @@ document.addEventListener("DOMContentLoaded", function(){
 	    	ctx.stroke();
 
 	}}
+
+	class rotationIcon {
+		constructor(x, y, width, height) {
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.height = height;
+			this.image = document.getElementById('rotationImage');
+			this.imageWidth = 50;
+			this.imageHeight = 50;
+			this.speed = Math.random() * 4 + 1;
+
+		}
+		draw() {
+			ctx.drawImage(this.image, 0,0, this.imageWidth, this.imageHeight, this.x, this.y, this.width, this.height);
+
+		}
+
+		preShake() {
+
+		  ctx.save();
+		  var dx = Math.random()*2;
+		  var dy = Math.random()*1;
+		  ctx.translate(dx, dy); 
+		}
+		postShake() {
+			ctx.restore();
+		}
+	}
 
 
 	class Player {
@@ -729,13 +761,13 @@ document.addEventListener("DOMContentLoaded", function(){
 		players.push(new Player(shape.centerX, shape.centerY, shape.radius, shape_index, shape.playerColor, shape.playerLetter));
 		shape_index++;
 	}
-
 	let symbol_size = 27;
 	let rotationButtonCoords = {x: court.courtWidth - symbol_size/2, y: court.outHeight/2 - symbol_size/2, width: symbol_size, height: symbol_size};
 
 	let symbol_circle_size = 7;
 	let rotationSymbolCoords = {x: court.x, y: court.outHeight/2, radius: symbol_circle_size/2};
 
+	rotation_icon = new rotationIcon(rotationButtonCoords.x, rotationButtonCoords.y, rotationButtonCoords.width, rotationButtonCoords.height);
 
 	canvas.addEventListener("touchstart", read_touch);
 	canvas.addEventListener("touchend", mouse_up);
@@ -765,6 +797,19 @@ document.addEventListener("DOMContentLoaded", function(){
 				player.draw();
 		 		}
 		 	);
+	    if (!animationIcon)
+	    {
+	    	rotation_icon.draw();
+		} else {
+
+			rotation_icon.preShake();
+	    	rotation_icon.draw();
+	    	rotation_icon.postShake();
+	    	if (window.performance.now() - shakeStart >= 250) {
+	    		animationIcon = false;
+	    	}
+
+		}
 		drawRotationPosition();
 		requestAnimationFrame(animate);
 	}
