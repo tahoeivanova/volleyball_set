@@ -342,9 +342,9 @@ let mouse_down = function(event) {
 }
 
  let read_touch = function (event) {
- 	// event.preventDefault();
+ 	event.preventDefault();
  	// console.log(court.zoneArray[0])
- 	// console.log("TOUCH");
+ 	console.log("TOUCH");
     // let canvasRect = canvas.getBoundingClientRect();
     let touch = event.touches[0];
    	// console.log(event.touches[0]);
