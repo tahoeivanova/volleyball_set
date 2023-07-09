@@ -416,6 +416,7 @@ let mouse_down = function(event) {
     // startX = touch.pageX - document.documentElement.scrollLeft - canvas.getBoundingClientRect().left;
     // startY = touch.pageY - document.documentElement.scrollTop - canvas.getBoundingClientRect().top;
     // console.log(startX, startY);
+	if (mouse_in_rotation_button(startX, startY, rotationButtonCoords)) rotatePlayers();
 
     let index = 0;
 	for (let zone of court.zoneArray) {

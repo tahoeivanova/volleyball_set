@@ -21,36 +21,5 @@ body {
 	padding:0px;
 	margin:0px;
 	}
-}
 
-.controls {
-	position: absolute;
-
-}
-/*#rotation {
-	position: absolute;
-	z-index: 10;
-	top: 50px;
-	left: 50%;
-	transform: translate(-50%);
-}*/
-
-#rotation {
-
-        text-align: center;
-        vertical-align: middle;
-        border: 2px solid goldenrod;
-        border-radius: 7px;
-        background-color: gold;
-        color: orangeRed;
-        font-size: 32px;
-        font-weight: bold;
-        font-family: "Courier New";
-        width: 5em;
-        margin: 5px auto;}
-
-#rotation img {
-	width: 20px;
-	height: 20px;
-}
 
