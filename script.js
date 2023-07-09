@@ -1,7 +1,6 @@
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
 
-console.log("innerWidth ", window.innerWidth)
 if (window.innerWidth >= 768) {
 	canvas.width = 500;
 	canvas.height = 1000;
@@ -9,7 +8,14 @@ if (window.innerWidth >= 768) {
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 	}
-console.log("canvas.width ", canvas.width)
+
+
+// const rotation = document.getElementById("rotation");
+// rotation.addEventListener('change', function(e){
+// 	court.rotate();
+// });
+
+
 
 var playingCourtScale = 0.85;
 let current_zone_index = -1;
@@ -18,9 +24,16 @@ is_dragging = false;
 let startX;
 let startY;
 let players = [];
-let zoneArrayGlobal;
+let zoneArrayProtocol = [];
+let rotateProcess = false;
+let rotatingStatus = [];
+
+function rotatePlayers() {
+	rotateProcess = true;
+	// court.rotate();
 
 
+}
 
 let is_mouse_in_shape = function(x, y, shape) {
 	let centerX = shape.centerX;
@@ -66,41 +79,52 @@ class Out {
 
 class playingCourt {
 	constructor(width, height, outWidthScale) {
-		this.courtWidth =  width * outWidthScale;
-		this.x = this.outWidth = (width - this.courtWidth)/2;
+		this.width = parseInt(width);
+		this.height = parseInt(height);
+
+		this.courtWidth =  parseInt(this.width * outWidthScale);
+		this.x = this.outWidth = parseInt((this.width - this.courtWidth)/2);
 
 		this.courtHeight = this.courtWidth*2;
-		this.y = this.outHeight = (height - this.courtHeight)/2;
+		this.y = this.outHeight = parseInt((this.height - this.courtHeight)/2);
 
 		this.side1 = {x:this.x, y:this.y, width: this.courtHeight/2, height: this.courtHeight/2};
 		this.side2 = {x:this.x, y:this.y + this.courtHeight/2, width: this.courtWidth, height: this.courtHeight/2};
 
 		this.zoneArray = [
 				{zone: 1, side: 1, x:this.x, y:this.y, width: this.courtWidth/3, height: this.courtHeight/4, color: "#ff3377", playerColor: "#00ff80"},
-				{zone: 6, side: 1, x:this.x + this.courtWidth/3, y:this.y, width: this.courtHeight/6, height: this.courtHeight/4, color: "#ff4d88", playerColor: "#0088cc"},
+				{zone: 6, side: 1, x:parseInt(this.x + this.courtWidth/3), y:this.y, width: this.courtHeight/6, height: this.courtHeight/4, color: "#ff4d88", playerColor: "#0088cc"},
 				{zone: 5, side: 1, x:this.x + (this.courtWidth/3)*2, y:this.y, width: this.courtHeight/6, height: this.courtHeight/4, color: "#ff6699", playerColor: "#ff0000"},//#ff1a1a #ff4d4d
 				{zone: 4, side: 1, x:this.x + (this.courtWidth/3)*2, y:this.y + this.courtHeight/4, width: this.courtWidth/3, height: this.courtHeight/4, color: "#ff6699", playerColor: "#ff6633"},
 				{zone: 3, side: 1, x:this.x + this.courtWidth/3, y:this.y  + this.courtHeight/4, width: this.courtWidth/3, height: this.courtHeight/4, color: "#ff99bb", playerColor: "#4dc3ff"},
 				{zone: 2, side: 1, x:this.x, y:this.y  + this.courtHeight/4, width: this.courtWidth/3, height: this.courtHeight/4, color: "#ffb3cc", playerColor: "#ff1a1a"}//#cc0000
 		];
+		console.log(this.zoneArray);
 
 
 	}
 	init() {
 	    for (let i = 0; i < this.zoneArray.length; i++){
 		
-			let centerX = this.zoneArray[i].x + this.zoneArray[i].width/2;
-			let centerY = this.zoneArray[i].y + this.zoneArray[i].height/2;
-			let radius = this.zoneArray[i].width* playerScale /2;
+			let centerX = parseInt(this.zoneArray[i].x + this.zoneArray[i].width/2);
+			let centerY = parseInt(this.zoneArray[i].y + this.zoneArray[i].height/2);
+			let radius = parseInt(this.zoneArray[i].width* playerScale /2);
 			this.zoneArray[i].centerX = centerX;
 			this.zoneArray[i].centerY = centerY;
 			this.zoneArray[i].radius = radius;
+
     	}
+    	// zoneArrayProtocol = this.zoneArray;
+    	zoneArrayProtocol = JSON.parse(JSON.stringify(this.zoneArray));;
+
+    	console.log("zoneArrayProtocol", zoneArrayProtocol);
 	}
 
-	rotate() {
-		
-	}
+	// rotate() {
+	// 	console.log("Rotate");
+	// 	this.zoneArray = this.zoneArray.splice(-1).concat(this.zoneArray);
+	// 	console.log(this.zoneArray);
+	// 	}
 
 	draw() {
 	
@@ -161,6 +185,8 @@ class Player {
 		this.radius = radius;
 		this.player_index = player_index;
 		this.playerColor = playerColor;
+		this.speed = 1.5;
+		this.isRotating = false;
 	}
 	draw() {
 		ctx.beginPath();
@@ -178,6 +204,111 @@ class Player {
 			this.y = court.zoneArray[current_zone_index].centerY;
 
 		}
+		if (rotateProcess) {
+
+			this.isRotating = true;
+			rotatingStatus[this.player_index] = this.isRotating;
+			console.log("zoneArrayProtocol from rot",zoneArrayProtocol);
+			// Rotation from zone 1, 6
+
+			let next_player_index;
+			if (this.player_index == court.zoneArray.length - 1) {
+				next_player_index = 0;
+			}
+			else {
+				next_player_index = this.player_index + 1
+			}
+			console.log("zoneArrayProtocol[this.player_index + 1].centerX", zoneArrayProtocol[next_player_index].centerX);
+
+			const dx = this.x - zoneArrayProtocol[next_player_index].centerX;
+
+			const dy = this.y - zoneArrayProtocol[next_player_index].centerY;
+			const distance = Math.sqrt(dx*dx+dy*dy);
+			console.log("distance", distance);
+
+			let moves = distance/this.speed;
+
+			let xunits = dx/moves; 
+			let yunits = dy/moves; 
+			console.log("yunits", yunits)
+
+			if (distance > xunits) {
+				this.x-=xunits;
+			}
+			else {
+				this.x = zoneArrayProtocol[next_player_index].centerX;
+
+			}
+
+// 3 3 3 3 111
+// 3 3 3 3 9
+// 3 3 3 3 1		
+
+			if (distance > yunits) {
+				this.y-=yunits;
+				console.log(distance);
+
+				console.log(this.y);
+			}
+			else {
+				this.y = zoneArrayProtocol[next_player_index].centerY;
+
+			}
+			if (this.x === zoneArrayProtocol[next_player_index].centerX && this.y === zoneArrayProtocol[next_player_index].centerY) {
+				this.isRotating = false;
+				rotatingStatus[this.player_index] = this.isRotating;
+
+
+			}
+			console.log("rotatingStatus", rotatingStatus);
+			if (rotatingStatus.length === zoneArrayProtocol.length) {
+				rotateProcess = !rotatingStatus.every(elem => elem === false);
+				console.log("ROTATION END", rotateProcess);
+			}
+			
+
+
+
+
+
+
+			// if (this.player_index in [0, 1]) {
+			// 	if (this.x < zoneArrayProtocol[this.player_index + 1].centerX) {
+			// 		this.x+=this.speed;
+			// 	} 
+			// 	else if (this.x > zoneArrayProtocol[this.player_index + 1].centerX) {
+			// 		this.x--;
+
+			// 	}
+			// 	if (this.y < zoneArrayProtocol[this.player_index + 1].centerY) {
+			// 		this.y+=this.speed;
+			// 	} else if (this.y > zoneArrayProtocol[this.player_index + 1].centerY) {
+			// 		this.y-=this.speed
+			// 	}
+			// }
+
+	
+	
+			
+			// for (let i = 0; i <=1;  i++) {
+			// 	while (court.zoneArray[i].centerX !== zoneArrayProtocol[i + 1].centerX) {
+			// 			if (court.zoneArray[i].centerX < zoneArrayProtocol[i + 1].centerX) {
+			// 				this.x++;	
+			// 			} else {
+			// 				this.x--;
+			// 			}
+			// 		}
+			// 	while (court.zoneArray[i].centerY !== zoneArrayProtocol[i + 1].centerY) {
+			// 			if (court.zoneArray[i].centerY < zoneArrayProtocol[i + 1].centerY) {
+			// 				this.y++;	
+			// 			} else {
+			// 				this.y--;
+			// 			}
+			// 		}
+			// }
+			// rotate = false;
+
+		}
 	}
 
 }
@@ -190,7 +321,7 @@ let mouse_down = function(event) {
 
 	startX = parseInt(event.clientX - canvas.getBoundingClientRect().left);
 	startY = parseInt(event.clientY - canvas.getBoundingClientRect().top);
-	console.log(startX, startY)
+	// console.log(startX, startY)
 	// else if (event.touches) {
 	// 	console.log("Touch")
 	// 	startX = parseInt(event.touches[0].clientX - canvas.getBoundingClientRect().left);
@@ -212,23 +343,23 @@ let mouse_down = function(event) {
 
  let read_touch = function (event) {
  	// event.preventDefault();
- 	console.log(court.zoneArray[0])
- 	console.log("TOUCH");
+ 	// console.log(court.zoneArray[0])
+ 	// console.log("TOUCH");
     // let canvasRect = canvas.getBoundingClientRect();
     let touch = event.touches[0];
-   	console.log(event.touches[0]);
+   	// console.log(event.touches[0]);
 	startX = parseInt(event.touches[0].clientX - canvas.getBoundingClientRect().left);
 	startY = parseInt(event.touches[0].clientY - canvas.getBoundingClientRect().top)
     // startX = touch.pageX - document.documentElement.scrollLeft - canvas.getBoundingClientRect().left;
     // startY = touch.pageY - document.documentElement.scrollTop - canvas.getBoundingClientRect().top;
-    console.log(startX, startY);
+    // console.log(startX, startY);
 
     let index = 0;
 	for (let zone of court.zoneArray) {
 		if (is_mouse_in_shape(startX, startY, zone)) {
 			current_zone_index = index;
 			is_dragging = true;
-			console.log("PLAYER")
+			// console.log("PLAYER")
 			return
 
 		}
@@ -261,7 +392,7 @@ let touch_move = function(event) {
 	else {
 		event.preventDefault();
 		let touch = event.touches[0];
-   		console.log(event.touches[0]);
+   		// console.log(event.touches[0]);
 		let mouseX = parseInt(event.touches[0].clientX - canvas.getBoundingClientRect().left);
 		let mouseY = parseInt(event.touches[0].clientY - canvas.getBoundingClientRect().top)
 		let dx = mouseX - startX;
@@ -293,7 +424,7 @@ let touch_move = function(event) {
 		// BORDER RESTRICTIONS>>>>>>>
 
 		// <<<<PLAYER RESTRICTIONS
-		console.log("current_zone_index", current_zone_index)
+		// console.log("current_zone_index", current_zone_index)
 		if ([3, 4].includes(current_zone_index)) {
 			if (court.zoneArray[current_zone_index].centerX <= court.zoneArray[current_zone_index + 1].centerX) {
 
@@ -306,7 +437,7 @@ let touch_move = function(event) {
 			court.zoneArray[current_zone_index].centerX = court.zoneArray[current_zone_index - 1].centerX - 5;
 		} }
 		if ([1, 2].includes(current_zone_index)) {
-			console.log("zone", current_zone_index);
+			// console.log("zone", current_zone_index);
 			if (court.zoneArray[current_zone_index].centerX <= court.zoneArray[current_zone_index - 1].centerX) {
 
 			court.zoneArray[current_zone_index].centerX = court.zoneArray[current_zone_index - 1].centerX + 5;
@@ -319,23 +450,23 @@ let touch_move = function(event) {
 		} }
 		// vertical
 		if ([0, 1, 2].includes(current_zone_index)) {
-			console.log(1, court.zoneArray[current_zone_index]);
+			// console.log(1, court.zoneArray[current_zone_index]);
 			const reversed_array = [...court.zoneArray].reverse();
 			// reversed_array = reversed_array.reverse();
-			console.log(2, reversed_array[current_zone_index]);
+			// console.log(2, reversed_array[current_zone_index]);
 
 			if (court.zoneArray[current_zone_index].centerY >= reversed_array[current_zone_index].centerY) {
-				console.log("Ouch");
+				// console.log("Ouch");
 				court.zoneArray[current_zone_index].centerY = reversed_array[current_zone_index].centerY - 5;
 		} }
 		if ([3, 4, 5].includes(current_zone_index)) {
-			console.log(1, court.zoneArray[current_zone_index]);
+			// console.log(1, court.zoneArray[current_zone_index]);
 			const reversed_array = [...court.zoneArray].reverse();
 			// reversed_array = reversed_array.reverse();
-			console.log(2, reversed_array[current_zone_index]);
+			// console.log(2, reversed_array[current_zone_index]);
 
 			if (court.zoneArray[current_zone_index].centerY <= reversed_array[current_zone_index].centerY) {
-				console.log("Ouch");
+				// console.log("Ouch");
 				court.zoneArray[current_zone_index].centerY = reversed_array[current_zone_index].centerY + 5;
 		} }
 		// PLAYER RESTRICTIONS>>>>>>>
@@ -397,9 +528,9 @@ let mouse_move = function(event) {
 		}
 		// BORDER RESTRICTIONS>>>>>>>
 		// <<<<PLAYER RESTRICTIONS
-		console.log("current_zone_index", current_zone_index)
+		// console.log("current_zone_index", current_zone_index)
 		if ([4, 3].includes(current_zone_index)) {
-			console.log("zone", current_zone_index);
+			// console.log("zone", current_zone_index);
 			if (court.zoneArray[current_zone_index].centerX <= court.zoneArray[current_zone_index + 1].centerX) {
 
 			court.zoneArray[current_zone_index].centerX = court.zoneArray[current_zone_index + 1].centerX + 5;
@@ -411,7 +542,7 @@ let mouse_move = function(event) {
 			court.zoneArray[current_zone_index].centerX = court.zoneArray[current_zone_index - 1].centerX - 5;
 		} }
 		if ([1, 2].includes(current_zone_index)) {
-			console.log("zone", current_zone_index);
+			// console.log("zone", current_zone_index);
 			if (court.zoneArray[current_zone_index].centerX <= court.zoneArray[current_zone_index - 1].centerX) {
 
 			court.zoneArray[current_zone_index].centerX = court.zoneArray[current_zone_index - 1].centerX + 5;
@@ -424,23 +555,23 @@ let mouse_move = function(event) {
 		} }
 		// vertical
 		if ([0, 1, 2].includes(current_zone_index)) {
-			console.log(1, court.zoneArray[current_zone_index]);
+			// console.log(1, court.zoneArray[current_zone_index]);
 			const reversed_array = [...court.zoneArray].reverse();
 			// reversed_array = reversed_array.reverse();
-			console.log(2, reversed_array[current_zone_index]);
+			// console.log(2, reversed_array[current_zone_index]);
 
 			if (court.zoneArray[current_zone_index].centerY >= reversed_array[current_zone_index].centerY) {
-				console.log("Ouch");
+				// console.log("Ouch");
 				court.zoneArray[current_zone_index].centerY = reversed_array[current_zone_index].centerY - 5;
 		} }
 		if ([3, 4, 5].includes(current_zone_index)) {
-			console.log(1, court.zoneArray[current_zone_index]);
+			// console.log(1, court.zoneArray[current_zone_index]);
 			const reversed_array = [...court.zoneArray].reverse();
 			// reversed_array = reversed_array.reverse();
-			console.log(2, reversed_array[current_zone_index]);
+			// console.log(2, reversed_array[current_zone_index]);
 
 			if (court.zoneArray[current_zone_index].centerY <= reversed_array[current_zone_index].centerY) {
-				console.log("Ouch");
+				// console.log("Ouch");
 				court.zoneArray[current_zone_index].centerY = reversed_array[current_zone_index].centerY + 5;
 		} }
 		// PLAYER RESTRICTIONS>>>>>>>
@@ -481,9 +612,10 @@ canvas.onmousemove = mouse_move;
 let lastTime = 0;
 
 function animate(timeStamp){
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+
 	const deltaTime = timeStamp - lastTime;
 	lastTime = timeStamp;
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 
 
