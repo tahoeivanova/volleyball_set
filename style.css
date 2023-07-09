@@ -22,4 +22,6 @@ body {
 	margin:0px;
 	}
 
-
+#rotationImage {
+	display:  none;
+}

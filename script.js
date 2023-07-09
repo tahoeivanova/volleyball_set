@@ -31,11 +31,19 @@ document.addEventListener("DOMContentLoaded", function(){
 	let rotatingStatus = [];
 	let rotationPosition = 1;
 	let rotationSymbols = [];
+	let rotation_image = document.getElementById('rotationImage');
+	let animationIcon = false;
 
 	function rotatePlayers() {
 		rotateProcess = true;
 		// court.rotate();
 
+
+	}
+
+	function animateIcon() {
+		// animationIcon = true;
+	 //    ctx.drawImage(rotation_image, 0,0, 50, 50, rotationButtonCoords.x, rotationButtonCoords.y, rotationButtonCoords.width, rotationButtonCoords.height);
 
 	}
 
@@ -79,15 +87,19 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 		}
-		ctx.strokeStyle = 'green';
-	    ctx.strokeRect(rotationButtonCoords.x, rotationButtonCoords.y, rotationButtonCoords.width, rotationButtonCoords.height);
-		ctx.textAlign = 'center';
-		ctx.textBaseline = 'middle';
-		ctx.fillStyle = 'black';
-		ctx.font = '18pt Times';
-		ctx.fillText(rotationPosition, rotationButtonCoords.x + rotationButtonCoords.width/2, rotationButtonCoords.y + rotationButtonCoords.height/2);
-		ctx.fillStyle = 'white';
-		ctx.fillText(rotationPosition, rotationButtonCoords.x + rotationButtonCoords.width/2 + 2, rotationButtonCoords.y + rotationButtonCoords.height/2+ 2);
+		// ctx.strokeStyle = '#808080';
+	 //    ctx.strokeRect(rotationButtonCoords.x, rotationButtonCoords.y, rotationButtonCoords.width, rotationButtonCoords.height);
+	    if (!animationIcon)
+	    {
+	    	ctx.drawImage(rotation_image, 0,0, 50, 50, rotationButtonCoords.x, rotationButtonCoords.y, rotationButtonCoords.width, rotationButtonCoords.height);
+		}
+		// ctx.textAlign = 'center';
+		// ctx.textBaseline = 'middle';
+		// ctx.fillStyle = 'black';
+		// ctx.font = '18pt Times';
+		// ctx.fillText(rotationPosition, rotationButtonCoords.x + rotationButtonCoords.width/2, rotationButtonCoords.y + rotationButtonCoords.height/2);
+		// ctx.fillStyle = 'white';
+		// ctx.fillText(rotationPosition, rotationButtonCoords.x + rotationButtonCoords.width/2 + 2, rotationButtonCoords.y + rotationButtonCoords.height/2+ 2);
 
 	}
 
@@ -440,7 +452,11 @@ document.addEventListener("DOMContentLoaded", function(){
 
 		// }
 		//rotation button
-		if (mouse_in_rotation_button(startX, startY, rotationButtonCoords)) rotatePlayers();
+		if (mouse_in_rotation_button(startX, startY, rotationButtonCoords)) 
+			{
+				animateIcon();
+				rotatePlayers()
+			};
 
 		// players
 		let index = 0;
