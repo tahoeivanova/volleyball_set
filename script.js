@@ -17,7 +17,7 @@ if (window.innerWidth >= 768) {
 
 
 
-var playingCourtScale = 0.78;
+var playingCourtScale = 0.85;
 let current_zone_index = -1;
 let playerScale = 0.4;
 is_dragging = false;
@@ -28,6 +28,7 @@ let zoneArrayProtocol = [];
 let rotateProcess = false;
 let rotatingStatus = [];
 let rotationPosition = 1;
+let rotationSymbols = [];
 
 function rotatePlayers() {
 	rotateProcess = true;
@@ -38,16 +39,18 @@ function rotatePlayers() {
 
 function drawRotationPosition() {
 
-	// ctx.strokeStyle = 'green';
- //    ctx.strokeRect(court.courtWidth/2 + court.x - 12, court.outHeight/2 - 12, 33, 33);
+	ctx.strokeStyle = 'green';
+    ctx.strokeRect(rotationButtonCoords.x, rotationButtonCoords.y, rotationButtonCoords.width, rotationButtonCoords.height);
 	ctx.textAlign = 'center';
+	ctx.textBaseline = 'middle';
 	ctx.fillStyle = 'black';
 	ctx.font = '18pt Times';
-	ctx.fillText("R " + rotationPosition, court.courtWidth/2 + court.x + 3, court.outHeight/2 + 10);
+	ctx.fillText(rotationPosition, rotationButtonCoords.x + rotationButtonCoords.width/2, rotationButtonCoords.y + rotationButtonCoords.height/2);
 	ctx.fillStyle = 'white';
-	ctx.fillText("R " + rotationPosition, court.courtWidth/2 + court.x + 2 + 3, court.outHeight/2 + 2 + 10);
+	ctx.fillText(rotationPosition, rotationButtonCoords.x + rotationButtonCoords.width/2 + 2, rotationButtonCoords.y + rotationButtonCoords.height/2+ 2);
 
 }
+
 
 
 let mouse_in_rotation_button = function(x, y, coords) {
@@ -112,12 +115,12 @@ class playingCourt {
 		this.side2 = {x:this.x, y:this.y + this.courtHeight/2, width: this.courtWidth, height: this.courtHeight/2};
 
 		this.zoneArray = [
-				{zone: 1, side: 1, x:this.x, y:this.y, width: this.courtWidth/3, height: this.courtHeight/4, color: "#ff3377", playerColor: "#00ff80"},
-				{zone: 6, side: 1, x:parseInt(this.x + this.courtWidth/3), y:this.y, width: this.courtHeight/6, height: this.courtHeight/4, color: "#ff4d88", playerColor: "#0088cc"},
-				{zone: 5, side: 1, x:this.x + (this.courtWidth/3)*2, y:this.y, width: this.courtHeight/6, height: this.courtHeight/4, color: "#ff6699", playerColor: "#ff0000"},//#ff1a1a #ff4d4d
-				{zone: 4, side: 1, x:this.x + (this.courtWidth/3)*2, y:this.y + this.courtHeight/4, width: this.courtWidth/3, height: this.courtHeight/4, color: "#ff6699", playerColor: "#ff6633"},
-				{zone: 3, side: 1, x:this.x + this.courtWidth/3, y:this.y  + this.courtHeight/4, width: this.courtWidth/3, height: this.courtHeight/4, color: "#ff99bb", playerColor: "#4dc3ff"},
-				{zone: 2, side: 1, x:this.x, y:this.y  + this.courtHeight/4, width: this.courtWidth/3, height: this.courtHeight/4, color: "#ffb3cc", playerColor: "#ff1a1a"}//#cc0000
+				{zone: 1, side: 1, x:this.x, y:this.y, width: this.courtWidth/3, height: this.courtHeight/4, color: "#ff3377", playerColor: "#00ff80", playerLetter: "С"},
+				{zone: 6, side: 1, x:parseInt(this.x + this.courtWidth/3), y:this.y, width: this.courtHeight/6, height: this.courtHeight/4, color: "#ff4d88", playerColor: "#0088cc", playerLetter: "Ц"},
+				{zone: 5, side: 1, x:this.x + (this.courtWidth/3)*2, y:this.y, width: this.courtHeight/6, height: this.courtHeight/4, color: "#ff6699", playerColor: "#ff0000", playerLetter: "А"},//#ff1a1a #ff4d4d
+				{zone: 4, side: 1, x:this.x + (this.courtWidth/3)*2, y:this.y + this.courtHeight/4, width: this.courtWidth/3, height: this.courtHeight/4, color: "#ff6699", playerColor: "#ff6633", playerLetter: "Д"},
+				{zone: 3, side: 1, x:this.x + this.courtWidth/3, y:this.y  + this.courtHeight/4, width: this.courtWidth/3, height: this.courtHeight/4, color: "#ff99bb", playerColor: "#4dc3ff", playerLetter: "Ц"},
+				{zone: 2, side: 1, x:this.x, y:this.y  + this.courtHeight/4, width: this.courtWidth/3, height: this.courtHeight/4, color: "#ffb3cc", playerColor: "#ff1a1a", playerLetter: "А"}//#cc0000
 		];
 
 
@@ -197,14 +200,15 @@ class playingCourt {
 
 
 class Player {
-	constructor(x, y, radius, player_index, playerColor) {
+	constructor(x, y, radius, player_index, playerColor, playerLetter) {
 		this.x = x;
 		this.y = y;
 		this.radius = radius;
 		this.player_index = player_index;
 		this.playerColor = playerColor;
-		this.speed = 1.5;
+		this.speed = 1.6;
 		this.isRotating = false;
+		this.playerLetter = playerLetter;
 	}
 	draw() {
 		ctx.beginPath();
@@ -214,6 +218,13 @@ class Player {
 		ctx.lineWidth = 3;
 		ctx.strokeStyle = 'black';
 		ctx.stroke();
+
+		ctx.textAlign = 'center';
+		ctx.textBaseline = 'middle';
+		ctx.fillStyle = 'black';
+		ctx.font = '12pt Times';
+		ctx.fillText(this.playerLetter, this.x, this.y);
+
 	}
 	update() {
 		if (is_dragging && this.player_index === current_zone_index) {
@@ -659,11 +670,12 @@ court.init();
 
 let shape_index = 0;
 for (shape of court.zoneArray) {
-	players.push(new Player(shape.centerX, shape.centerY, shape.radius, shape_index, shape.playerColor));
+	players.push(new Player(shape.centerX, shape.centerY, shape.radius, shape_index, shape.playerColor, shape.playerLetter));
 	shape_index++;
 }
 
-let rotationButtonCoords = {x: court.courtWidth/2 + court.x - 12, y: court.outHeight/2 - 12, width: 33, height: 33};
+let button_size = 27;
+let rotationButtonCoords = {x: court.courtWidth/2 + court.outWidth - button_size/2, y: court.outHeight/2 - button_size/2, width: button_size, height: button_size};
 
 
 canvas.addEventListener("touchstart", read_touch);
