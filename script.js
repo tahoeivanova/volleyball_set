@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function(){
 		canvas.height = window.innerHeight
 		})
 
-	// const doc = document.documentElement;
+	const wholeDocument = document.documentElement;
 	// if (window.innerWidth >= 768) {
 	
 	// 	// canvas.width = 500;
@@ -44,7 +44,9 @@ document.addEventListener("DOMContentLoaded", function(){
 	let animationIcon = false;
 	let shakeStart;
 	let shakeEnd;
+	const htmlFullScreenButton = document.getElementById('htmlFullScreenButton');
 
+	htmlFullScreenButton.addEventListener('click', toggleFullScreen);
 
 
 
@@ -61,19 +63,19 @@ document.addEventListener("DOMContentLoaded", function(){
 	}
 
 	function toggleFullScreen(){
-		console.log(document.fullscreenElement);
+		document.getElementById("htmlFullScreenButton").style.visibility = "hidden"
 		if (!document.fullscreenElement) {
-			  if (canvas.requestFullscreen) {
-			    canvas.requestFullscreen().catch(err => {
+			  if (wholeDocument.requestFullscreen) {
+			    wholeDocument.requestFullscreen().catch(err => {
 			alert(`Error, can't enable full-screen mode: ${err.message}`);
 			});
 			  } 
 			  else if (canvas.webkitRequestFullscreen) { /* Safari */
-			    canvas.webkitRequestFullscreen().catch(err => {
+			    wholeDocument.webkitRequestFullscreen().catch(err => {
 			alert(`Error, can't enable full-screen mode: ${err.message}`);
 			});
 			  } else if (canvas.msRequestFullscreen) { /* IE11 */
-			    canvas.msRequestFullscreen().catch(err => {
+			    wholeDocument.msRequestFullscreen().catch(err => {
 			alert(`Error, can't enable full-screen mode: ${err.message}`);
 			});
 			  }
@@ -298,8 +300,8 @@ document.addEventListener("DOMContentLoaded", function(){
 			this.width = width;
 			this.height = height;
 			this.image = document.getElementById('fullScreenButton');
-			this.imageWidth = 32;
-			this.imageHeight = 32;
+			this.imageWidth = 64;
+			this.imageHeight = 64;
 
 		}
 		draw() {
@@ -516,7 +518,18 @@ document.addEventListener("DOMContentLoaded", function(){
 		// fullscreen button
 		if (mouse_in_button(startX, startY, fullscreen_button)) 
 			{
-				toggleFullScreen();
+				if (document.getElementById("htmlFullScreenButton").style.visibility == "visible")
+					{	
+						console.log("VISIBLE -> HIDDEN")
+						document.getElementById("htmlFullScreenButton").style.visibility = "hidden";
+					}
+				else {
+					console.log("HIDDEN -> VISIBLE")
+					document.getElementById("htmlFullScreenButton").style.visibility = "visible";
+					}
+				 
+				// toggleFullScreen();
+				
 			};
 		// players
 		let index = 0;
@@ -547,7 +560,16 @@ document.addEventListener("DOMContentLoaded", function(){
 		// fullscreen button
 		if (mouse_in_button(startX, startY, fullscreen_button)) 
 			{
-				toggleFullScreen();
+				if (document.getElementById("htmlFullScreenButton").style.visibility === "visible")
+					{	
+						console.log("VISIBLE -> HIDDEN")
+						document.getElementById("htmlFullScreenButton").style.visibility = "hidden";
+					}
+				else {
+					console.log("HIDDEN -> VISIBLE")
+					document.getElementById("htmlFullScreenButton").style.visibility = "visible";
+					}
+				// toggleFullScreen();
 			};
 
 		// players
