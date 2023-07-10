@@ -1,7 +1,8 @@
 * {
-	margin: 0;
-	padding: 0;
+	margin: 0px;
+	padding: 0px;
 	box-sizing: border-box;
+    background-color: #1a53ff;
 
 }
 body {
@@ -9,19 +10,21 @@ body {
 	width:  100vw;
 	height: 100vh;
 	overflow:  hidden;
+	margin: 0;
 }
+
 #canvas1 {
-	border: 2px solid silver;
+	border: none;
 	position: absolute;
 	top:  50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
 	max-width: 100%;
 	max-height: 100%;
-	padding:0px;
-	margin:0px;
+	padding:0;
+	margin:0;
 	}
 
-#rotationImage {
+#rotationImage, #fullScreenButton {
 	display:  none;
 }
