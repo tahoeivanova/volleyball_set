@@ -1,23 +1,33 @@
 document.addEventListener("DOMContentLoaded", function(){
 
+
+
 	const canvas = document.getElementById("canvas1");
 	const ctx = canvas.getContext("2d");
 
-	if (window.innerWidth >= 768) {
-		canvas.width = 500;
-		canvas.height = 1000;
-	} else {
-		canvas.width = window.innerWidth;
-		canvas.height = window.innerHeight;
-		}
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+
+	window.addEventListener("resize", function() {
+		canvas.width = window.innerWidth
+		canvas.height = window.innerHeight
+		})
+
+	// const doc = document.documentElement;
+	// if (window.innerWidth >= 768) {
+	
+	// 	// canvas.width = 500;
+	// 	// canvas.height = 1000;
+	// 	canvas.width = window.innerWidth;
+	// 	canvas.height = window.innerHeight;
+	// } else {
 
 
-	// const rotation = document.getElementById("rotation");
-	// rotation.addEventListener('change', function(e){
-	// 	court.rotate();
-	// });
-
-
+ //    	// canvas.width = document.body.clientWidth; //document.width is obsolete
+ //    	// canvas.height = document.body.clientHeight; //document.height is obsolete		
+	// 	canvas.width = window.innerWidth;
+	// 	canvas.height = window.innerHeight;
+	// 	}
 
 	var playingCourtScale = 0.85;
 	let current_zone_index = -1;
@@ -31,9 +41,12 @@ document.addEventListener("DOMContentLoaded", function(){
 	let rotatingStatus = [];
 	let rotationPosition = 1;
 	let rotationSymbols = [];
-	// let rotation_image = document.getElementById('rotationImage');
 	let animationIcon = false;
 	let shakeStart;
+	let shakeEnd;
+
+
+
 
 	function rotatePlayers() {
 		rotateProcess = true;
@@ -45,8 +58,38 @@ document.addEventListener("DOMContentLoaded", function(){
 	function animateIcon() {
 		animationIcon = true;
 		shakeStart = window.performance.now();
+	}
 
+	function toggleFullScreen(){
+		console.log(document.fullscreenElement);
+		if (!document.fullscreenElement) {
+			  if (canvas.requestFullscreen) {
+			    canvas.requestFullscreen().catch(err => {
+			alert(`Error, can't enable full-screen mode: ${err.message}`);
+			});
+			  } 
+			  else if (canvas.webkitRequestFullscreen) { /* Safari */
+			    canvas.webkitRequestFullscreen().catch(err => {
+			alert(`Error, can't enable full-screen mode: ${err.message}`);
+			});
+			  } else if (canvas.msRequestFullscreen) { /* IE11 */
+			    canvas.msRequestFullscreen().catch(err => {
+			alert(`Error, can't enable full-screen mode: ${err.message}`);
+			});
+			  }
 
+			// canvas.requestFullscreen().catch(err => {
+			// 	alert(`Error, can't enable full-screen mode: ${err.message}`);
+			// });
+		} else {
+			  if(document.exitFullscreen) {
+				    document.exitFullscreen();
+				  } else if(document.mozCancelFullScreen) {
+				    document.mozCancelFullScreen();
+				  } else if(document.webkitExitFullscreen) {
+				    document.webkitExitFullscreen();
+				  }
+		}
 	}
 
 	function drawRotationPosition() {
@@ -108,7 +151,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 
-	let mouse_in_rotation_button = function(x, y, coords) {
+	let mouse_in_button = function(x, y, coords) {
 		if (x >= coords.x && x <= (coords.x + coords.width) && y >= coords.y && y <= (coords.y + coords.height))
 			{return true}
 		return false
@@ -147,21 +190,34 @@ document.addEventListener("DOMContentLoaded", function(){
 
 	class playingCourt {
 		constructor(width, height, outWidthScale) {
-			this.width = parseInt(width);
-			this.height = parseInt(height);
+			this.width = width;
+			this.height = height;
+			if(window.innerWidth < 768) {
+				this.courtWidth =  this.width * outWidthScale;
+				this.x = this.outWidth = (this.width - this.courtWidth)/2;
 
-			this.courtWidth =  parseInt(this.width * outWidthScale);
-			this.x = this.outWidth = parseInt((this.width - this.courtWidth)/2);
+				this.courtHeight = this.courtWidth*2;
+				this.y = this.outHeight = (this.height - this.courtHeight)/2;
 
-			this.courtHeight = this.courtWidth*2;
-			this.y = this.outHeight = parseInt((this.height - this.courtHeight)/2);
+			}
+			else
+			{
+				this.courtHeight = this.height * outWidthScale;
+				this.y = this.outHeight = (this.height - this.courtHeight)/2;	
+
+				this.courtWidth =  this.courtHeight/2;
+				this.x = this.outWidth = (this.width - this.courtWidth)/2;
+
+
+			}
+
 
 			this.side1 = {x:this.x, y:this.y, width: this.courtHeight/2, height: this.courtHeight/2};
 			this.side2 = {x:this.x, y:this.y + this.courtHeight/2, width: this.courtWidth, height: this.courtHeight/2};
 
 			this.zoneArray = [
 					{zone: 1, side: 1, x:this.x, y:this.y, width: this.courtWidth/3, height: this.courtHeight/4, color: "#ff3377", playerColor: "#00ff80", playerLetter: "С"},
-					{zone: 6, side: 1, x:parseInt(this.x + this.courtWidth/3), y:this.y, width: this.courtHeight/6, height: this.courtHeight/4, color: "#ff4d88", playerColor: "#0088cc", playerLetter: "Ц"},
+					{zone: 6, side: 1, x:this.x + this.courtWidth/3, y:this.y, width: this.courtHeight/6, height: this.courtHeight/4, color: "#ff4d88", playerColor: "#0088cc", playerLetter: "Ц"},
 					{zone: 5, side: 1, x:this.x + (this.courtWidth/3)*2, y:this.y, width: this.courtHeight/6, height: this.courtHeight/4, color: "#ff6699", playerColor: "#ff0000", playerLetter: "А"},//#ff1a1a #ff4d4d
 					{zone: 4, side: 1, x:this.x + (this.courtWidth/3)*2, y:this.y + this.courtHeight/4, width: this.courtWidth/3, height: this.courtHeight/4, color: "#ff6699", playerColor: "#ff6633", playerLetter: "Д"},
 					{zone: 3, side: 1, x:this.x + this.courtWidth/3, y:this.y  + this.courtHeight/4, width: this.courtWidth/3, height: this.courtHeight/4, color: "#ff99bb", playerColor: "#4dc3ff", playerLetter: "Ц"},
@@ -173,9 +229,9 @@ document.addEventListener("DOMContentLoaded", function(){
 		init() {
 		    for (let i = 0; i < this.zoneArray.length; i++){
 			
-				let centerX = parseInt(this.zoneArray[i].x + this.zoneArray[i].width/2);
-				let centerY = parseInt(this.zoneArray[i].y + this.zoneArray[i].height/2);
-				let radius = parseInt(this.zoneArray[i].width* playerScale /2);
+				let centerX = this.zoneArray[i].x + this.zoneArray[i].width/2;
+				let centerY = this.zoneArray[i].y + this.zoneArray[i].height/2;
+				let radius = this.zoneArray[i].width* playerScale /2;
 				this.zoneArray[i].centerX = centerX;
 				this.zoneArray[i].centerY = centerY;
 				this.zoneArray[i].radius = radius;
@@ -234,6 +290,23 @@ document.addEventListener("DOMContentLoaded", function(){
 	    	ctx.stroke();
 
 	}}
+
+	class toggleFullScreenButton {
+		constructor(x, y, width, height) {
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.height = height;
+			this.image = document.getElementById('fullScreenButton');
+			this.imageWidth = 32;
+			this.imageHeight = 32;
+
+		}
+		draw() {
+			ctx.drawImage(this.image, 0,0, this.imageWidth, this.imageHeight, this.x, this.y, this.width, this.height);
+
+		}		
+	}
 
 	class rotationIcon {
 		constructor(x, y, width, height) {
@@ -300,7 +373,6 @@ document.addEventListener("DOMContentLoaded", function(){
 
 			}
 			if (rotateProcess) {
-
 				this.isRotating = true;
 				rotatingStatus[this.player_index] = this.isRotating;
 				// Rotation from zone 1, 6
@@ -436,12 +508,16 @@ document.addEventListener("DOMContentLoaded", function(){
 		startY = parseInt(event.clientY - canvas.getBoundingClientRect().top);
 
 		//rotation button
-		if (mouse_in_rotation_button(startX, startY, rotationButtonCoords)) 
+		if (mouse_in_button(startX, startY, rotationButtonCoords)) 
 			{
 				animateIcon();
 				rotatePlayers()
 			};
-
+		// fullscreen button
+		if (mouse_in_button(startX, startY, fullscreen_button)) 
+			{
+				toggleFullScreen();
+			};
 		// players
 		let index = 0;
 		for (let zone of court.zoneArray) {
@@ -461,12 +537,20 @@ document.addEventListener("DOMContentLoaded", function(){
 		startX = parseInt(event.touches[0].clientX - canvas.getBoundingClientRect().left);
 		startY = parseInt(event.touches[0].clientY - canvas.getBoundingClientRect().top)
 
-		if (mouse_in_rotation_button(startX, startY, rotationButtonCoords)) 
+		//rotation button
+		if (mouse_in_button(startX, startY, rotationButtonCoords)) 
 			{
 				animateIcon();
 				rotatePlayers()
 			};
 
+		// fullscreen button
+		if (mouse_in_button(startX, startY, fullscreen_button)) 
+			{
+				toggleFullScreen();
+			};
+
+		// players
 	    let index = 0;
 		for (let zone of court.zoneArray) {
 			if (is_mouse_in_shape(startX, startY, zone)) {
@@ -670,13 +754,13 @@ document.addEventListener("DOMContentLoaded", function(){
 		shape_index++;
 	}
 	let symbol_size = 27;
-	let rotationButtonCoords = {x: court.courtWidth - symbol_size/2, y: court.outHeight/2 - symbol_size/2, width: symbol_size, height: symbol_size};
+	let rotationButtonCoords = {x: canvas.width - court.outWidth - symbol_size*2.7, y: court.outHeight/2 - symbol_size/2, width: symbol_size, height: symbol_size};
 
 	let symbol_circle_size = 7;
 	let rotationSymbolCoords = {x: court.x, y: court.outHeight/2, radius: symbol_circle_size/2};
 
 	rotation_icon = new rotationIcon(rotationButtonCoords.x, rotationButtonCoords.y, rotationButtonCoords.width, rotationButtonCoords.height);
-
+	fullscreen_button = new toggleFullScreenButton(rotationButtonCoords.x + rotationButtonCoords.width*2, rotationButtonCoords.y, rotationButtonCoords.width, rotationButtonCoords.height);
 	canvas.addEventListener("touchstart", read_touch);
 	canvas.addEventListener("touchend", mouse_up);
 	canvas.addEventListener("touchcancel", mouse_out);
@@ -713,11 +797,13 @@ document.addEventListener("DOMContentLoaded", function(){
 			rotation_icon.preShake();
 	    	rotation_icon.draw();
 	    	rotation_icon.postShake();
-	    	if (window.performance.now() - shakeStart >= 250) {
+	    	shakeEnd = window.performance.now();
+	    	if (shakeEnd - shakeStart >= 250) {
 	    		animationIcon = false;
 	    	}
 
 		}
+		fullscreen_button.draw()
 		drawRotationPosition();
 		requestAnimationFrame(animate);
 	}
